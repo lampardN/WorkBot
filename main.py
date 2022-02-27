@@ -39,23 +39,17 @@ def remind(message):
     messageToUser(message.chat.id)
 
 
-@bot.message_handler(commands=['test'])
-def test(message):
-    messageToUser()
-
-
 @bot.message_handler(content_types=['document'])
-def test(message):
+def pars(message):
+    """Saving file"""
+    save_dir = "."
+    file_name = message.document.file_name
+    file_id_info = bot.get_file(message.document.file_id)
+    downloaded_file = bot.download_file(file_id_info.file_path)
+    src = file_name
+    with open(save_dir + "/" + src, 'wb') as new_file:
+        new_file.write(downloaded_file)
     try:
-        """Saving file"""
-        save_dir = "."
-        file_name = message.document.file_name
-        file_id_info = bot.get_file(message.document.file_id)
-        downloaded_file = bot.download_file(file_id_info.file_path)
-        src = file_name
-        with open(save_dir + "/" + src, 'wb') as new_file:
-            new_file.write(downloaded_file)
-
         """Reading file"""
         wb = openpyxl.load_workbook(filename=file_name)
         sheet = wb[wb.get_sheet_names()[0]]
@@ -90,10 +84,13 @@ def test(message):
 
         db.close()
         bot.send_message(message.chat.id, "Информация успешно добавлена в базу")
-        path = os.path.join(os.path.abspath(os.path.dirname(__file__)), file_name)
-        os.remove(path)
+
     except:
         bot.send_message(message.chat.id, "Не могу выполнить ваш запрос")
+
+    finally:
+        path = os.path.join(os.path.abspath(os.path.dirname(__file__)), file_name)
+        os.remove(path)
 
 
 class ScheduleMessage():
@@ -118,7 +115,8 @@ def button_query(call):
         db.close()
     except:
         bot.answer_callback_query(callback_query_id=call.id, show_alert=True, text="Запись удалена из ваших заметок")
-    bot.delete_message(call.message.chat.id, call.message.message_id)
+    finally:
+        bot.delete_message(call.message.chat.id, call.message.message_id)
 
 
 def messageToUser(users=None):
@@ -152,7 +150,7 @@ def send_message():
     messageToUser()
 
 
-schedule.every().day.at("01:00").do(send_message)
+schedule.every().day.at("09:00").do(send_message)
 
 
 if __name__ == "__main__":
