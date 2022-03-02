@@ -75,7 +75,7 @@ def pars(message):
                 """select * from orders where \"group\"=:group and practice_name=:practice_name and begin=:begin and end=:end""",
                 data[increment])
             if not cur.fetchall():
-                cur.execute("""insert into orders(\"group\", practice_name, begin, end, status) values (?, ?, ?, ?)""",
+                cur.execute("""insert into orders(\"group\", practice_name, begin, end) values (?, ?, ?, ?)""",
                             (data[increment]["group"],
                              data[increment]["practice_name"],
                              data[increment]["begin"],
